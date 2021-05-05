@@ -37,14 +37,14 @@ namespace WymianaKsiazek.Api.Controllers
             return Ok();
         }*/
         [HttpGet("offers")]
-        [Route("/")]
+        //[Route("/")]
         public ActionResult<List<OfferMP>> GetAllOffers()
         {
             var offers = _context.Offer.ToList();
             return _mapper.Map<List<OfferMP>>(offers);
         }
         [HttpPost("books")]
-        [Route("/")]
+        //[Route("/")]
         [Authorize]
         public async Task<IActionResult> AddOffer([FromBody]OfferAdd off)
         {
@@ -70,7 +70,7 @@ namespace WymianaKsiazek.Api.Controllers
             return Ok();
         }
         [HttpGet("{id}")]
-        [Route("/")]
+        //[Route("/")]
         public ActionResult<OfferMP> offer(long id)
         {
             var offer = _context.Offer.Include(x => x.Book).ThenInclude(b => b.Category)
@@ -82,7 +82,7 @@ namespace WymianaKsiazek.Api.Controllers
             return _mapper.Map<OfferMP>(offer);
         }
         [HttpGet("Profile/{id}")]
-        [Route("/")]
+        //[Route("/")]
         public ActionResult<UserMP> Profile(string id)
         {
             var user = _context.User.Include(x => x.Offers).Where(x => x.Id == id).FirstOrDefault();
@@ -93,7 +93,7 @@ namespace WymianaKsiazek.Api.Controllers
             return _mapper.Map<UserMP>(user);
         }
         [HttpGet("offers/{addressname}")]
-        [Route("/")]
+        //[Route("/")]
         public ActionResult<List<OfferMP>> GetCityOffers(string address)
         {
             long addressid = _context.Address.Where(x => x.Name == address).Select(x => x.Id).FirstOrDefault();
@@ -101,14 +101,14 @@ namespace WymianaKsiazek.Api.Controllers
             return _mapper.Map<List<OfferMP>>(offers);
         }
         [HttpGet("offers/address/{id}")]
-        [Route("/")]
+        //[Route("/")]
         public ActionResult<List<OfferMP>> GetOffersFromCity(long id)
         {
             var offers = _context.Offer.Where(x => x.AddressId == id).ToList();
             return _mapper.Map<List<OfferMP>>(offers);
         }
         [HttpGet("offers/book/{id}")]
-        [Route("/")]
+        //[Route("/")]
         public ActionResult<List<OfferMP>> GetBookOffers(long id)
         {
             var offers = _context.Offer.Where(x => x.BookId == id).ToList();
