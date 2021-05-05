@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace WymianaKsiazek.Api
+namespace myWebApp
 {
     public class Program
     {
