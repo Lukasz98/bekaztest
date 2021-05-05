@@ -11,6 +11,8 @@ using WymianaKsiazek.Api.Database.Entities;
 using WymianaKsiazek.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 
+using Microsoft.AspNetCore.Identity;
+
 namespace WymianaKsiazek.Api.Controllers
 {
     [ApiController]
