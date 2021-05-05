@@ -18,9 +18,9 @@ namespace WymianaKsiazek.Api.Database
 
         public DbSet<OfferEntity> Offer { get; set; }
 
-        public DbSet<CategoryEntity> Category { get; set; } 
+        public DbSet<CategoryEntity> Category { get; set; }
 
-        public DbSet<AddressEntity> Address { get; set; }
+        public DbSet<CategoryEntity> Address { get; set; }
 
         public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
 

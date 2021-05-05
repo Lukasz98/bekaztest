@@ -157,21 +157,12 @@ namespace WymianaKsiazek.Api.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Gmina")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Powiat")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Wojewodztwo")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Address");
+                    b.ToTable("AddressEntity");
                 });
 
             modelBuilder.Entity("WymianaKsiazek.Api.Database.Entities.BookEntity", b =>
@@ -212,7 +203,7 @@ namespace WymianaKsiazek.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("CategoryEntity");
                 });
 
             modelBuilder.Entity("WymianaKsiazek.Api.Database.Entities.OfferEntity", b =>

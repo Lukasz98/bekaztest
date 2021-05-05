@@ -11,11 +11,6 @@ namespace WymianaKsiazek.Api.Database.Entities
 
         public string Name { get; set; }
 
-        public string Wojewodztwo { get; set; }
-
-        public string Powiat { get; set; }
-        public string Gmina  { get; set; }
-
         public virtual ICollection<OfferEntity> Offers { get; set; }
 
         public AddressEntity()

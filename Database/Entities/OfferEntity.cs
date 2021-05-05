@@ -29,9 +29,5 @@ namespace WymianaKsiazek.Api.Database.Entities
             UpdatedOn = DateTime.UtcNow;
         }
 
-        public static implicit operator OfferEntity(BookEntity v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

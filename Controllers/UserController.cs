@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +20,7 @@ using WymianaKsiazek.Api.Models;
 namespace WymianaKsiazek.Api.Controllers
 {
     [ApiController]
-    [Route("")]
+    [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
@@ -25,19 +28,22 @@ namespace WymianaKsiazek.Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly SignInManager<UserEntity> _signInManager;
         private readonly UserManager<UserEntity> _userManager;
+        private readonly IMapper _mapper;
 
         public UserController(
             ILogger<UserController> logger,
             Context context,
             IConfiguration configuration,
             SignInManager<UserEntity> signInManager,
-            UserManager<UserEntity> userManager)
+            UserManager<UserEntity> userManager,
+            IMapper mapper)
         {
             _logger = logger;
             _context = context;
             _configuration = configuration;
             _signInManager = signInManager;
             _userManager = userManager;
+            _mapper = mapper;
         }
 
 

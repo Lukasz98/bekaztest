@@ -4,19 +4,29 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WymianaKsiazek.Api.Database;
+using WymianaKsiazek.Api.Models;
+using System.Collections.Generic;
+using AutoMapper;
 
 namespace WymianaKsiazek.Api.Controllers
 {
-    [Authorize]
     [ApiController]
-    [Route("")]
     public class BookController : BaseController
     {
         private readonly Context _context;
-
-        public BookController(Context context)
+        private readonly IMapper _mapper;
+        
+        public BookController(Context context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
+        }
+        [HttpGet("books/category/{id}")]
+        [Route("/")]
+        public ActionResult<List<BookMP>> GetCategoryOffers(long id)
+        {
+            var books = _context.Book.Where(x => x.CategoryId == id).ToList();
+            return _mapper.Map<List<BookMP>>(books);
         }
         /* zakomentowalam bo ksiazka nie ma usera i wgl nie wiem czy to bedzie potrzebne
         [HttpGet("books")] 

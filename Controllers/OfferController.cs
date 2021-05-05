@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,86 +9,109 @@ using System.Threading.Tasks;
 using WymianaKsiazek.Api.Database;
 using WymianaKsiazek.Api.Database.Entities;
 using WymianaKsiazek.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WymianaKsiazek.Api.Controllers
 {
-    //[Authorize] for logged in only users
-    [Route("api/[controller]")]
     [ApiController]
     public class OfferController : BaseController
     {
         private readonly Context _context;
+        private readonly IMapper _mapper;
+        private readonly UserManager<UserEntity> _userManager;
 
-        public OfferController(Context context)
+        public OfferController(Context context, IMapper mapper, UserManager<UserEntity> userManager)
         {
             _context = context;
+            _mapper = mapper;
+            _userManager = userManager;
         }
 
-        [HttpPost("addoffers")] 
-        public async Task<IActionResult> AddOffer([FromBody] CreateOfferInput model)
+        /*[HttpPost("books")] //jeszcze niezrobiony
+        public async Task<IActionResult> Add([FromBody] string content, long addressId, Boolean type, decimal price )
         {
-            Console.WriteLine("tu");
-            return await CreateOffer(model);
+            _context.Offer.Add(new OfferEntity { Content = content, AddressId=addressId, Type=type, Price=price,  UserId = CurrentUserId });
+            await _context.SaveChangesAsync();
+            return Ok();
+        }*/
+        [HttpGet("offers")]
+        [Route("/")]
+        public ActionResult<List<OfferMP>> GetAllOffers()
+        {
+            var offers = _context.Offer.ToList();
+            return _mapper.Map<List<OfferMP>>(offers);
         }
-
-        [HttpGet("categories")] //returns list of categories
-        public async Task<IActionResult> Get()
+        [HttpPost("books")]
+        [Route("/")]
+        [Authorize]
+        public async Task<IActionResult> AddOffer([FromBody]OfferAdd off)
         {
-            var categories = await _context.Category.ToListAsync();
-
-            if (categories.Count == 0)
-                return NotFound();
-
-            return Ok(categories);
-        }
-
-        [HttpGet("offers/{name}")] //returns ids of offer suitable (only by name) to searched
-        public async Task<IActionResult> Get(string name)
-        {
-           
-           
-            var books = await _context.Book.Where(x => x.Title.StartsWith(name)).ToListAsync();
-
-            if (books.Count == 0)
-                return NotFound();
-
-            return Ok(books);
-
-         
-        }
-      
-        private async Task<IActionResult> CreateOffer(CreateOfferInput model)
-        {
-            
-                OfferEntity offer = new OfferEntity();
-                BookEntity siazka = new BookEntity();
-
-                offer.Content = model.Content;    
-                offer.AddressId = model.AddressId;
-                offer.Price = model.Price;
-                offer.Type = model.Type;
-                offer.UserId = CurrentUserId;
-
-            siazka.Author = model.Author;
-            siazka.Title = model.Title;
-            siazka.CategoryId = model.CategoryId;
-
-
-            var record = _context.Book.FirstOrDefault(x => x.Title == model.Title && x.Author == model.Author);
-
-            if (record == null)
+            var checkbook = _context.Book.Where(x => x.Author == off.Book.Author && x.Title == off.Book.Title).FirstOrDefault();
+            long id;
+            //long addressid = _context.Address.Where(x => x.Name == off.Address).Select(x=>x.Id).FirstOrDefault();
+            string userid = _userManager.GetUserId(HttpContext.User);
+            if (checkbook == null)
             {
-                _context.Book.Add(siazka);
+                var book = new BookEntity { Title = off.Book.Title, Author = off.Book.Author, CategoryId = off.Book.CategoryId, Isbn = off.Book.Isbn};
+                _context.Book.Add(book);
                 await _context.SaveChangesAsync();
-                record = _context.Book.FirstOrDefault(x => x.Title == model.Title);
+                var book2 = _context.Book.Where(x => x.Author == off.Book.Author && x.Title == off.Book.Title).FirstOrDefault();
+                id = book2.Id;
             }
-
-            offer.BookId = record.Id;
+            else
+            {
+                id = checkbook.Id;
+            }
+            var offer = new OfferEntity {Content = off.Content, Price = off.Price, BookId = id, Type = off.Type, AddressId = off.AddressId, UserId = userid};
             _context.Offer.Add(offer);
             await _context.SaveChangesAsync();
-            
-
             return Ok();
         }
+        [HttpGet("{id}")]
+        [Route("/")]
+        public ActionResult<OfferMP> offer(long id)
+        {
+            var offer = _context.Offer.Include(x => x.Book).ThenInclude(b => b.Category)
+                .Include(x => x.User).Include(x => x.Address).Where(x => x.Id == id).FirstOrDefault();
+            if(offer == null)
+            {
+                return NotFound();
+            }
+            return _mapper.Map<OfferMP>(offer);
+        }
+        [HttpGet("Profile/{id}")]
+        [Route("/")]
+        public ActionResult<UserMP> Profile(string id)
+        {
+            var user = _context.User.Include(x => x.Offers).Where(x => x.Id == id).FirstOrDefault();
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return _mapper.Map<UserMP>(user);
+        }
+        [HttpGet("offers/{addressname}")]
+        [Route("/")]
+        public ActionResult<List<OfferMP>> GetCityOffers(string address)
+        {
+            long addressid = _context.Address.Where(x => x.Name == address).Select(x => x.Id).FirstOrDefault();
+            var offers = _context.Offer.Where(x => x.AddressId == addressid).ToList();
+            return _mapper.Map<List<OfferMP>>(offers);
+        }
+        [HttpGet("offers/address/{id}")]
+        [Route("/")]
+        public ActionResult<List<OfferMP>> GetOffersFromCity(long id)
+        {
+            var offers = _context.Offer.Where(x => x.AddressId == id).ToList();
+            return _mapper.Map<List<OfferMP>>(offers);
+        }
+        [HttpGet("offers/book/{id}")]
+        [Route("/")]
+        public ActionResult<List<OfferMP>> GetBookOffers(long id)
+        {
+            var offers = _context.Offer.Where(x => x.BookId == id).ToList();
+            return _mapper.Map<List<OfferMP>>(offers);
+        }
+
     }
 }
