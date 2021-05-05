@@ -22,7 +22,7 @@ namespace WymianaKsiazek.Api.Controllers
             _mapper = mapper;
         }
         [HttpGet("books/category/{id}")]
-        [Route("/")]
+        //[Route("/")]
         public ActionResult<List<BookMP>> GetCategoryOffers(long id)
         {
             var books = _context.Book.Where(x => x.CategoryId == id).ToList();
